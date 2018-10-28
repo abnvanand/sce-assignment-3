@@ -2,18 +2,15 @@ def _lcs(new_list, old_list):
     if len(new_list) == 0 or len(old_list) == 0:
         return []
 
-    if len(new_list) > 0 and len(old_list) > 0:
-        new_first, *new_rest = new_list
-        old_first, *old_rest = old_list
-        if new_first == old_first:
-            return [new_first] + _lcs(new_rest, old_rest)
+    new_first, *new_rest = new_list
+    old_first, *old_rest = old_list
+    if new_first == old_first:
+        return [new_first] + _lcs(new_rest, old_rest)
 
-        x = _lcs(new_rest, old_list)
-        y = _lcs(new_list, old_rest)
+    x = _lcs(new_rest, old_list)
+    y = _lcs(new_list, old_rest)
 
-        return x if len(x) > len(y) else y
-
-    return []
+    return x if len(x) > len(y) else y
 
 
 def _diff(old, new, subsequence):

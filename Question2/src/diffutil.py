@@ -1,16 +1,19 @@
-def _lcs(new_list, old_list):
-    if len(new_list) == 0 or len(old_list) == 0:
+def _lcs(new_list, old_list, i, j, table):
+    if i >= len(new_list) or j >= len(old_list):
         return []
 
-    new_first, *new_rest = new_list
-    old_first, *old_rest = old_list
-    if new_first == old_first:
-        return [new_first] + _lcs(new_rest, old_rest)
+    if table[i][j]:
+        # cached info available
+        return table[i][j]
 
-    x = _lcs(new_rest, old_list)
-    y = _lcs(new_list, old_rest)
+    if new_list[i] == old_list[j]:
+        return [new_list[i]] + _lcs(new_list, old_list, i + 1, j + 1, table)
 
-    return x if len(x) > len(y) else y
+    x = _lcs(new_list, old_list, i + 1, j, table)
+    y = _lcs(new_list, old_list, i, j + 1, table)
+
+    table[i][j] = x if len(x) > len(y) else y
+    return table[i][j]
 
 
 def _diff(old, new, subsequence):
@@ -49,15 +52,16 @@ def _diff(old, new, subsequence):
 
 def diff_helper(old, new):
     # FIXME: optimize memory usage
-    orig_list = open(old).readlines()
     new_list = open(new).readlines()
+    orig_list = open(old).readlines()
 
-    lcs = _lcs(new_list, orig_list)
+    table = [["" for _ in range(len(orig_list))] for _ in range(len(new_list))]
+    lcs = _lcs(new_list, orig_list, 0, 0, table)
     diffs = _diff(list(orig_list), list(new_list), list(lcs))
 
-    # print("lcs:", )
-    # for i in lcs:
-    #     print(i, end='')
+    print("lcs:", )
+    for i in lcs:
+        print(i, end='')
 
     print("diff:", )
     for i in diffs:
@@ -65,5 +69,5 @@ def diff_helper(old, new):
 
 
 if __name__ == "__main__":
-    # diff_helper("/home/abhinav/pintos.old/src/threads/synch.c", "/home/abhinav/pintos-anon/src/threads/synch.c")
-    diff_helper("temp/file1.txt", "temp/file2.txt")
+    diff_helper("/home/abhinav/pintos.old/src/threads/synch.c", "/home/abhinav/pintos-anon/src/threads/synch.c")
+    # diff_helper("temp/file1.txt", "temp/file2.txt")
